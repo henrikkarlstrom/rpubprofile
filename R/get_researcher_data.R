@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @examples
-#' get_researcher_data(scopus_id = "0123456789", apiKey = "0123abcd0123abcd")
+#' get_researcher_data(scopus_id = "23056907500", apiKey = Sys.getenv("SCOPUS_API_KEY"))
 get_researcher_data <- function(scopus_id, apiKey) {
 
   # API query specification
