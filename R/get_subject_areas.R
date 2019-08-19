@@ -12,7 +12,7 @@
 #' @examples
 #' get_subject_areas(data)
 #'
-get_subject_areas <- function(data) {
+get_subject_areas <- function(data, apiKey) {
 
   #remove publications that don't have an associated ISSN values
   field <- data[!is.na(data[, "prism:issn"]),]
@@ -40,9 +40,6 @@ get_subject_areas <- function(data) {
 
   # creates a new data frame with field counts
   field <- as.data.frame(table(field[[4]]))
-
-  # makes the data frame more ggplot-friendly
-  field <- field[order(-field[[2]]), ]
 
   return(field)
 }

@@ -12,7 +12,7 @@ plot_field_data <- function(field_data) {
 
   #selects the top five fields
   ggplot2::ggplot(data = field_data[1:5, ],
-                  aes(x = reorder(Var1, Freq),
+                  ggplot2::aes(x = reorder(Var1, Freq),
                       y = Freq)) +
 
     #defines bar chart and fill colour
@@ -45,7 +45,7 @@ plot_field_data <- function(field_data) {
                                                       margin = ggplot2::margin(5, 0, 15, 0)),
                    axis.text = ggplot2::element_text(size=10,
                                                      color="#222222"),
-                   axis.text.x = ggplot2::element_text(margin = margin(5, b = 10)),
+                   axis.text.x = ggplot2::element_text(margin = ggplot2::margin(5, b = 10)),
                    axis.ticks = ggplot2::element_blank(),
                    axis.line = ggplot2::element_blank(),
                    panel.grid.minor = ggplot2::element_blank(),

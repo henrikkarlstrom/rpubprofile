@@ -12,7 +12,7 @@ plot_publication_profile <- function(publication_data) {
 
   # create the plot
   plot <- ggplot2::ggplot(data = publication_data,
-                          aes(x = Year,
+                          ggplot2::aes(x = Year,
                               y = Citations,
                               color = factor(Corresponding))) +
 
@@ -62,7 +62,7 @@ plot_publication_profile <- function(publication_data) {
                                                          margin = ggplot2::margin(5, 0, 15, 0)),
                    axis.text = ggplot2::element_text(size=10,
                                                      color="#222222"),
-                   axis.text.x = ggplot2::element_text(margin = margin(5, b = 10)),
+                   axis.text.x = ggplot2::element_text(margin = ggplot2::margin(5, b = 10)),
 
                    panel.grid.minor = ggplot2::element_blank(),
                    panel.grid.major.y = ggplot2::element_line(color="#cbcbcb"),
@@ -75,13 +75,13 @@ plot_publication_profile <- function(publication_data) {
   xdens <- cowplot::axis_canvas(plot,
                                 axis = "x",
                                 data = publication_data,
-                                aes(x = Year)) +
+                                ggplot2::aes(x = Year)) +
     ggplot2::geom_histogram(color = "black",
                             fill = "white",
                             size = 0.2,
                             binwidth = 1,
                             na.rm = TRUE) +
-    ggplot2::stat_bin(aes(y = ..count..,
+    ggplot2::stat_bin(ggplot2::aes(y = ..count..,
                           label = ifelse(..count.. > 0,
                                          ..count..,
                                          "")),
