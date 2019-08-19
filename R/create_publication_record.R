@@ -1,7 +1,7 @@
 #' Create a publication record data frame for easy plotting
 #'
-#' @param data
-#' @param scopus_id
+#' @param data dataframe
+#' @param scopus_id string
 #'
 #' @return data frame with year (numeric), number of citations (numeric), corresponding
 #' status (logical) and author name (string)
