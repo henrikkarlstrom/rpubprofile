@@ -12,12 +12,19 @@ plot_field_data <- function(field_data) {
 
   #selects the top five fields
   ggplot2::ggplot(data = field_data[1:5, ],
-                  aes(x = Var1,
+                  aes(x = reorder(Var1, Freq),
                       y = Freq)) +
 
     #defines bar chart and fill colour
     ggplot2::geom_bar(stat = "identity",
                       fill = "#007f7f") +
+
+    #scale the axis properly
+    ggplot2::scale_y_continuous(expand = ggplot2::expand_scale(mult = c(0,0.2)),
+                                breaks = function(x)
+                                  unique(floor(pretty(seq(0, max(x) + 1) * 1.1)))
+                                ) +
+
 
     #flips the coordinates
     ggplot2::coord_flip() +
