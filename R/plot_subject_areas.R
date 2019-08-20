@@ -1,6 +1,6 @@
 #' Plot the most active research subjects as an ordered bar chart
 #'
-#' @param field_data
+#' @param subject_areas
 #'
 #' @return Bar chart
 #' @export
@@ -8,10 +8,12 @@
 #' @examples
 #'
 #'
-plot_field_data <- function(field_data) {
+plot_subject_areas <- function(subject_areas) {
+
+  subject_areas <- subject_areas[order(-subject_areas[["Freq"]]),]
 
   #selects the top five fields
-  ggplot2::ggplot(data = field_data[1:5, ],
+  ggplot2::ggplot(data = subject_areas[1:5,],
                   ggplot2::aes(x = reorder(Var1, Freq),
                       y = Freq)) +
 
