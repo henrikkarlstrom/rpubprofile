@@ -3,5 +3,5 @@
 export(create_publication_record)
 export(get_researcher_data)
 export(get_subject_areas)
-export(plot_field_data)
 export(plot_publication_profile)
+export(plot_subject_areas)
