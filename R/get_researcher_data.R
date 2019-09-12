@@ -19,7 +19,7 @@ get_researcher_data <- function(scopus_id, apiKey) {
                                  ")"),
                     query = list(apiKey = apiKey,
                                  count = 200,
-                                 field = "prism:coverDate,author,dc:creator,citedby-count,prism:issn"),
+                                 view = "STANDARD"),
                     httr::add_headers(Accept = "application/json"))
 
   #stops the function if the call is not successful
@@ -32,6 +32,30 @@ get_researcher_data <- function(scopus_id, apiKey) {
 
   #subset the returned data and return it as a data frame
   data <- data[["search-results"]][["entry"]]
+  
+  #look up author indexed name using Scopus ID
+  author <- httr::GET(url = data[[2]][[1]][["@href"]][[2]], 
+                      query = list(apiKey = apiKey))
+  
+  author <- jsonlite::fromJSON(httr::content(author, "text"))
+  
+  #extrcating author name value
+  author <- author[["abstracts-retrieval-response"]][["authors"]][["author"]]
+  
+  author <- author[which(author[["@auid"]] == scopus_id),][["preferred-name"]][["ce:indexed-name"]]
+  
+  #check if author is corresponding
+  data[["corresponding"]] <- ifelse(data[["dc:creator"]] == author, 1, 0)
+  
+  #create table of results
+  data <- data.frame(Year = as.Date(data[["prism:coverDate"]]),
+                     Citations = as.numeric(data[["citedby-count"]]),
+                     ISSN = data[["prism:issn"]],
+                     Corresponding = as.numeric(data[["corresponding"]]),
+                     Author = author)
+  
+  #convert date format to year values
+  data[["Year"]] <- as.numeric(substr(data[["Year"]], 1, 4))
 
   return(data)
 }

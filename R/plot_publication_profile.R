@@ -42,7 +42,7 @@ plot_publication_profile <- function(publication_data) {
                                                          2,
                                                          1))) +
 
-    ggplot2::scale_colour_manual(values = c("#333333", "red")) +
+    ggplot2::scale_colour_manual(values = c("#333333", "skyblue")) +
 
     #define title, subtitle and axis titles
     ggplot2::labs(title = paste0("Publication profile for ",
