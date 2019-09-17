@@ -39,7 +39,9 @@ Use of rpubprofile functions:
 library(rpubprofile)
 ## get researcher data on Rosalind Franklin
 data <- get_researcher_data("23056907500", apiKey = Sys.getenv("SCOPUS_API_KEY"))
-
+```
+```{r plot, echo = FALSE}
+suppressWarnings(plot_publication_profile(data))
 ```
 
 

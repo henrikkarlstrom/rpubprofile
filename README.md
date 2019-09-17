@@ -27,3 +27,5 @@ library(rpubprofile)
 ## get researcher data on Rosalind Franklin
 data <- get_researcher_data("23056907500", apiKey = Sys.getenv("SCOPUS_API_KEY"))
 ```
+
+<img src="man/figures/README-plot-1.png" width="100%" />
