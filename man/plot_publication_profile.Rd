@@ -4,7 +4,7 @@
 \alias{plot_publication_profile}
 \title{Plot publication and citation count as a marginal histogram scatter plot}
 \usage{
-plot_publication_profile(publication_data)
+plot_publication_profile(publication_data, author_threshold)
 }
 \arguments{
 \item{publication_data}{}
