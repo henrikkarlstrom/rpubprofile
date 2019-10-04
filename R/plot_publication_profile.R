@@ -7,14 +7,20 @@
 #'
 #' @examples
 #'
-plot_publication_profile <- function(publication_data) {
+plot_publication_profile <- function(publication_data,
+                                     author_threshold) {
+  
+  publication_data[["many_authors"]] <- ifelse(publication_data[["author_count"]] > author_threshold,
+                                               1,
+                                               0)
 
 
   # create the plot
   plot <- ggplot2::ggplot(data = publication_data,
                           ggplot2::aes(x = Year,
                               y = Citations,
-                              color = factor(Corresponding))) +
+                              color = factor(Corresponding),
+                              shape = factor(many_authors))) +
 
     #specify the type of plot
     ggplot2::geom_jitter(width = 0,
