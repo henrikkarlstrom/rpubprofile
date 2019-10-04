@@ -46,7 +46,7 @@ get_researcher_data <- function(scopus_id, apiKey) {
                    function(x) x[["abstracts-retrieval-response"]][["authors"]][["author"]])
   
   author_count <- lapply(author, function(x) as.numeric(nrow(x)))
-  author_count <- data.frame(do.call(rbind, author_count))
+  author_count <- data.frame(author_count = do.call(rbind, author_count))
   
   profile_name <- author[[1]][which(author[[1]][["@auid"]] == scopus_id),][["preferred-name"]][["ce:indexed-name"]]
   
@@ -59,7 +59,7 @@ get_researcher_data <- function(scopus_id, apiKey) {
                      ISSN = data[["prism:issn"]],
                      Corresponding = as.numeric(data[["corresponding"]]),
                      Author = profile_name,
-                     author_count = as.numeric(author_count))
+                     author_count = as.numeric(author_count[["author_count"]]))
   
   #convert date format to year values
   data[["Year"]] <- as.numeric(substr(data[["Year"]], 1, 4))
