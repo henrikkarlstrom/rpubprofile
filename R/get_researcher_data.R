@@ -34,25 +34,32 @@ get_researcher_data <- function(scopus_id, apiKey) {
   data <- data[["search-results"]][["entry"]]
   
   #look up author indexed name using Scopus ID
-  author <- httr::GET(url = data[[2]][[1]][["@href"]][[2]], 
-                      query = list(apiKey = apiKey))
+  author <- lapply(data[[2]], 
+                   function(x) httr::GET(url = x[["@href"]][[2]], 
+                      query = list(apiKey = apiKey)))
   
-  author <- jsonlite::fromJSON(httr::content(author, "text"))
+  author <- lapply(author, 
+                   function(x) jsonlite::fromJSON(httr::content(x, "text")))
   
-  #extrcating author name value
-  author <- author[["abstracts-retrieval-response"]][["authors"]][["author"]]
+  #extracting author name values
+  author <- lapply(author, 
+                   function(x) x[["abstracts-retrieval-response"]][["authors"]][["author"]])
   
-  author <- author[which(author[["@auid"]] == scopus_id),][["preferred-name"]][["ce:indexed-name"]]
+  author_count <- lapply(author, function(x) as.numeric(nrow(x)))
+  author_count <- data.frame(do.call(rbind, author_count))
+  
+  profile_name <- author[[1]][which(author[[1]][["@auid"]] == scopus_id),][["preferred-name"]][["ce:indexed-name"]]
   
   #check if author is corresponding
-  data[["corresponding"]] <- ifelse(data[["dc:creator"]] == author, 1, 0)
+  data[["corresponding"]] <- ifelse(data[["dc:creator"]] == profile_name, 1, 0)
   
   #create table of results
   data <- data.frame(Year = as.Date(data[["prism:coverDate"]]),
                      Citations = as.numeric(data[["citedby-count"]]),
                      ISSN = data[["prism:issn"]],
                      Corresponding = as.numeric(data[["corresponding"]]),
-                     Author = author)
+                     Author = profile_name,
+                     author_count = as.numeric(author_count))
   
   #convert date format to year values
   data[["Year"]] <- as.numeric(substr(data[["Year"]], 1, 4))
