@@ -8,11 +8,7 @@
 #' @examples
 #'
 plot_publication_profile <- function(publication_data,
-<<<<<<< HEAD
                                      author_threshold) {
-=======
-                                     author_threshold = 10) {
->>>>>>> cdc246f164bab786d0ba55e57f255e7e4681e380
   
   publication_data[["many_authors"]] <- ifelse(publication_data[["author_count"]] > author_threshold,
                                                1,
