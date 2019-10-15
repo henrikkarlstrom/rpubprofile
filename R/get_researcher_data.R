@@ -59,7 +59,7 @@ get_researcher_data <- function(scopus_id, apiKey) {
                      ISSN = data[["prism:issn"]],
                      Corresponding = as.numeric(data[["corresponding"]]),
                      Author = profile_name,
-                     author_count = as.numeric(author_count[["author_count"]]))
+                     author_count = as.numeric(author_count[["author_count"]]), stringsAsFactors = FALSE)
   
   #convert date format to year values
   data[["Year"]] <- as.numeric(substr(data[["Year"]], 1, 4))
