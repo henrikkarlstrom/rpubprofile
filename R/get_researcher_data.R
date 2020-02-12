@@ -47,20 +47,14 @@ get_researcher_data <- function(scopus_id, apiKey) {
   
   profile_name <- author[[1]][which(author[[1]][["@auid"]] == scopus_id),][["preferred-name"]][["ce:indexed-name"]]
   
-  #check if author is corresponding
-  data[["corresponding"]] <- ifelse(data[["dc:creator"]] == profile_name, 1, 0)
-  
   #create table of results
-  data <- data.frame(Year = as.Date(data[["prism:coverDate"]]),
+  data <- data.frame(Year = as.numeric(substr(data[["prism:coverDate"]], 1, 4)),
                      Citations = as.numeric(data[["citedby-count"]]),
-                     ISSN = data[["prism:issn"]],
-                     Corresponding = as.numeric(data[["corresponding"]]),
+                     Venue = data[["prism:publicationName"]],
+                     DOI = data[["prism:doi"]],
                      Author = profile_name,
                      author_count = unlist(lapply(author, function(x) length(x[["@auid"]]))),
                      order = unlist(lapply(author, function(x) which(x[["@auid"]] == scopus_id))))
-  
-  #convert date format to year values
-  data[["Year"]] <- as.numeric(substr(data[["Year"]], 1, 4))
 
   return(data)
 }
