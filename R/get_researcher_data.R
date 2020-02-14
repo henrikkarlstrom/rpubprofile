@@ -52,6 +52,7 @@ get_researcher_data <- function(scopus_id, apiKey) {
                      Citations = as.numeric(data[["citedby-count"]]),
                      Venue = data[["prism:publicationName"]],
                      DOI = data[["prism:doi"]],
+                     Title = data[["dc:title"]],
                      Author = profile_name,
                      author_count = unlist(lapply(author, function(x) length(x[["@auid"]]))),
                      order = unlist(lapply(author, function(x) which(x[["@auid"]] == scopus_id))))
