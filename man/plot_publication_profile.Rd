@@ -4,10 +4,10 @@
 \alias{plot_publication_profile}
 \title{Plot publication and citation count as a marginal histogram scatter plot}
 \usage{
-plot_publication_profile(publication_data, author_threshold)
+plot_publication_profile(researcher)
 }
 \arguments{
-\item{publication_data}{}
+\item{researcher}{Data frame with all relevant data for plotting}
 }
 \value{
 marginal histogram scatter plot
