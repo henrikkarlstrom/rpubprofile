@@ -12,12 +12,17 @@ get_researcher_data(scopus_id, apiKey)
 \item{apiKey}{string}
 }
 \value{
-data frame
+list containing publication data frame and collaboration network
+nodes and edges
 }
 \description{
-Pass the function a valid Scopus researcher ID and a valid Scopus API key and it
-returns a data frame of the recorded publications with relevant metadata.
+Pass the function a valid Scopus researcher ID and a valid Scopus API key and
+it returns a list containing a data frame of the recorded publications with 
+relevant metadata.
 }
 \examples{
-get_researcher_data(scopus_id = "23056907500", apiKey = Sys.getenv("SCOPUS_API_KEY"))
+get_researcher_data(
+scopus_id = "23056907500", 
+apiKey = Sys.getenv("SCOPUS_API_KEY")
+)
 }

@@ -16,5 +16,5 @@ marginal histogram scatter plot
 Plot publication and citation count as a marginal histogram scatter plot
 }
 \examples{
-
+plot_publication_profile(researcher)
 }

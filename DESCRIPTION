@@ -15,7 +15,7 @@ Description: rpubprofile uses the Scopus API to fetch publication and citation d
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Suggests: 
     testthat (>= 2.1.0)
 Imports: 
@@ -23,4 +23,6 @@ Imports:
     cowplot,
     httr,
     jsonlite,
-    ggiraph
+    ggiraph,
+    visNetwork,
+    magrittr

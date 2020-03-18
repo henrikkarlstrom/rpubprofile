@@ -1,16 +1,22 @@
 #' Get Scopus researcher data
 #'
-#' Pass the function a valid Scopus researcher ID and a valid Scopus API key and it
-#' returns a data frame of the recorded publications with relevant metadata.
+#' Pass the function a valid Scopus researcher ID and a valid Scopus API key and
+#' it returns a list containing a data frame of the recorded publications with 
+#' relevant metadata.
 #'
 #' @param scopus_id string
 #' @param apiKey string
 #'
-#' @return data frame
+#' @return list containing publication data frame and collaboration network
+#' nodes and edges
+#' 
 #' @export
 #'
 #' @examples
-#' get_researcher_data(scopus_id = "23056907500", apiKey = Sys.getenv("SCOPUS_API_KEY"))
+#' get_researcher_data(
+#' scopus_id = "23056907500", 
+#' apiKey = Sys.getenv("SCOPUS_API_KEY")
+#' )
 get_researcher_data <- function(scopus_id, apiKey) {
   
   if(!grepl("^[0-9]{1,}$", scopus_id)) {
@@ -50,6 +56,63 @@ get_researcher_data <- function(scopus_id, apiKey) {
   #subset the returned data and return it as a data frame
   data <- data[["search-results"]][["entry"]]
   
+  #get author name for network graphing
+  author <- data[["author"]][[1]][["authname"]][
+    which(
+      data[["author"]][[1]][["authid"]] == scopus_id
+    )
+    ]
+  
+  #calculate author collabs for each publication
+  authcombo <- lapply(
+    data[["author"]], 
+    function(x) if(nrow(x) == 1){
+      NA
+    } else{
+      data.frame(
+        t(combn(x[["authname"]], 2)),
+        stringsAsFactors = FALSE
+      ) 
+    }
+  )
+  
+  #weight collabs according to number of co-authors on each publication
+  authcombo <- lapply(
+    authcombo,
+    function(x) cbind(
+      x, 
+      width = 2 / nrow(x)
+      )
+  )
+  
+  #remove single-author publications from the collaboration network
+  authcombo <- Filter(
+    function(x) length(x) > 1, 
+    authcombo
+    )
+  
+  #define edges of the collaboration network
+  edges <- do.call(
+    rbind, 
+    authcombo
+    )
+  colnames(edges) <- c("from", "to", "width")
+  edges <- edges[edges[["from"]] == author | edges[["to"]] == author, ]
+  edges <- edges[edges[["width"]] > 0.1, ]
+  
+  #define the collaborators
+  nodes <- data.frame(
+    id = unique(c(edges[["from"]], edges[["to"]]))
+  )
+  
+  nodes[["group"]] <- ifelse(nodes[["id"]] == author, "main", "co-pub")
+  nodes[["label"]] <- nodes[["id"]]
+  nodes[["title"]] <- nodes[["id"]]
+  nodes[["value"]] <- ifelse(nodes[["id"]] == author, 25, 15)
+  
+  #create a list object to return from the function
+  network <- list(edges, nodes, author)
+  
   authors <- do.call(
     rbind, 
     data[["author"]]
@@ -74,7 +137,6 @@ get_researcher_data <- function(scopus_id, apiKey) {
                   0)
     )
   )
-    
   
   
   data[["author"]] <- paste(authors[["given-name"]], authors[["surname"]])
@@ -97,5 +159,5 @@ get_researcher_data <- function(scopus_id, apiKey) {
   
   data[["Citations"]] <- as.numeric(data[["Citations"]])
 
-  return(data)
+  return(list(data, network))
 }

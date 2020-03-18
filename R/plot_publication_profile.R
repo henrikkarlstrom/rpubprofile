@@ -6,7 +6,7 @@
 #' @export
 #'
 #' @examples
-#'
+#' plot_publication_profile(researcher)
 plot_publication_profile <- function(researcher) {
   
   plot <- ggplot2::ggplot(
