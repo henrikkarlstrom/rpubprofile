@@ -20,34 +20,24 @@
 get_researcher_data <- function(scopus_id, apiKey) {
   
   if(!grepl("^[0-9]{1,}$", scopus_id)) {
-    stop(
-      "Invalid Scopus ID. Please input only numbers."
-    )
+    stop("Invalid Scopus ID. Please input only numbers.")
   }
 
   # API query specification
   data <- httr::GET(
-    url = paste0(
-      "https://api.elsevier.com/content/search/scopus?query=AU-ID(",
+    url = paste0("https://api.elsevier.com/content/search/scopus?query=AU-ID(",
       scopus_id,
-      ")"
-      ),
-    query = list(
-      apiKey = apiKey,
-      count = 200,
-      field = "prism:coverDate,dc:title,prism:publicationName,citedby-count,author"
-      ),
+      ")"),
+    query = list(apiKey = apiKey,
+                 count = 200,
+                 field = "prism:coverDate,dc:title,prism:publicationName,citedby-count,author"),
     httr::add_headers(Accept = "application/json")
     )
 
   #stops the function if the call is not successful
   if(httr::status_code(data) != 200){
-    stop(
-      paste0(
-        "API call failed with status code ",
-        httr::status_code(data)
-        )
-      )
+    stop(paste0("API call failed with status code ",
+                httr::status_code(data)))
   }
 
   #parse the response
@@ -57,53 +47,33 @@ get_researcher_data <- function(scopus_id, apiKey) {
   data <- data[["search-results"]][["entry"]]
   
   #get author name for network graphing
-  author <- data[["author"]][[1]][["authname"]][
-    which(
-      data[["author"]][[1]][["authid"]] == scopus_id
-    )
-    ]
+  author <- data[["author"]][[1]][["authname"]][which(data[["author"]][[1]][["authid"]] == scopus_id)]
   
   #calculate author collabs for each publication
-  authcombo <- lapply(
-    data[["author"]], 
-    function(x) if(nrow(x) == 1){
-      NA
-    } else{
-      data.frame(
-        t(combn(x[["authname"]], 2)),
-        stringsAsFactors = FALSE
-      ) 
-    }
-  )
+  authcombo <- lapply(data[["author"]],
+                      function(x) if(nrow(x) == 1){
+                        NA
+                        } else {
+                          data.frame(t(combn(x[["authname"]], 2)), stringsAsFactors = FALSE)
+                          })
   
   #weight collabs according to number of co-authors on each publication
-  authcombo <- lapply(
-    authcombo,
-    function(x) cbind(
-      x, 
-      width = 2 / nrow(x)
-      )
-  )
+  authcombo <- lapply(authcombo,
+                      function(x) cbind(x, width = 2 / nrow(x)))
   
   #remove single-author publications from the collaboration network
-  authcombo <- Filter(
-    function(x) length(x) > 1, 
-    authcombo
-    )
+  authcombo <- Filter(function(x) length(x) > 1,
+                      authcombo)
   
   #define edges of the collaboration network
-  edges <- do.call(
-    rbind, 
-    authcombo
-    )
+  edges <- do.call(rbind, authcombo)
   colnames(edges) <- c("from", "to", "width")
   edges <- edges[edges[["from"]] == author | edges[["to"]] == author, ]
   edges <- edges[edges[["width"]] > 0.1, ]
   
   #define the collaborators
-  nodes <- data.frame(
-    id = unique(c(edges[["from"]], edges[["to"]]))
-  )
+  nodes <- data.frame(id = unique(c(edges[["from"]], 
+                                    edges[["to"]])))
   
   nodes[["group"]] <- ifelse(nodes[["id"]] == author, "main", "co-pub")
   nodes[["label"]] <- nodes[["id"]]
@@ -113,49 +83,38 @@ get_researcher_data <- function(scopus_id, apiKey) {
   #create a list object to return from the function
   network <- list(edges, nodes, author)
   
-  authors <- do.call(
-    rbind, 
-    data[["author"]]
-    )
+  authors <- lapply(data[["author"]], '[', c("authid", "@seq", "given-name", "surname"))
+  
+  authors <- do.call(rbind, authors)
 
-  data[["author_count"]] <- as.numeric(
-    lapply(
-      data[["author"]], 
-      function(x) length(x[[1]])
-      )
-  )
+  data[["author_count"]] <- as.numeric(lapply(data[["author"]],
+                                              function(x) length(x[[1]])))
+  
+  data <- data[-which(lapply(data[["author"]], 
+                             function(x) any(x[["authid"]] == scopus_id)) == FALSE),]
   
   authors <- authors[authors[["authid"]] == scopus_id, ]
   
   data[["order"]] <- authors[["@seq"]]
   
   data[["first_or_last"]] = as.factor(
-    ifelse(data[["author_count"]] == data[["order"]],
-           1, 
-           ifelse(data[["order"]] == 1,
-                  1,
-                  0)
-    )
-  )
+    ifelse(data[["author_count"]] == data[["order"]], 1, 
+           ifelse(data[["order"]] == 1, 1, 0)))
   
   
   data[["author"]] <- paste(authors[["given-name"]], authors[["surname"]])
   
   data <- data[, c(3:8, 10)]
   
-  names(data) <- c(
-    "Title", 
-    "Venue", 
-    "Year", 
-    "Citations",
-    "Author",
-    "author_count", 
-    "first_or_last"
-    )
+  names(data) <- c("Title",
+                   "Venue",
+                   "Year",
+                   "Citations",
+                   "Author",
+                   "author_count",
+                   "first_or_last")
   
-  data[["Year"]] <- as.numeric(
-    substr(data[["Year"]], 1, 4)
-  )
+  data[["Year"]] <- as.numeric(substr(data[["Year"]], 1, 4))
   
   data[["Citations"]] <- as.numeric(data[["Citations"]])
 
