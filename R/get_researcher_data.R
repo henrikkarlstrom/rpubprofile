@@ -90,8 +90,13 @@ get_researcher_data <- function(scopus_id, apiKey) {
   data[["author_count"]] <- as.numeric(lapply(data[["author"]],
                                               function(x) length(x[[1]])))
   
-  data <- data[-which(lapply(data[["author"]], 
-                             function(x) any(x[["authid"]] == scopus_id)) == FALSE),]
+  if(length(which(lapply(data[["author"]],
+                         function(x) any(x[["authid"]] == scopus_id)) == FALSE)) > 1){
+    data <- data[-which(lapply(data[["author"]],
+                                function(x) any(x[["authid"]] == scopus_id)) == FALSE),]
+  } else {
+    data <- data
+  }
   
   authors <- authors[authors[["authid"]] == scopus_id, ]
   
