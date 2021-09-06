@@ -91,7 +91,7 @@ get_researcher_data <- function(scopus_id, apiKey) {
                                               function(x) length(x[[1]])))
   
   if(length(which(lapply(data[["author"]],
-                         function(x) any(x[["authid"]] == scopus_id)) == FALSE)) > 1){
+                         function(x) any(x[["authid"]] == scopus_id)) == FALSE)) > 0){
     data <- data[-which(lapply(data[["author"]],
                                 function(x) any(x[["authid"]] == scopus_id)) == FALSE),]
   } else {
